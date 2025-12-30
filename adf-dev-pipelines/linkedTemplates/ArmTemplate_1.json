@@ -19,7 +19,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Datafk",
+						"name": "Datak",
 						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
