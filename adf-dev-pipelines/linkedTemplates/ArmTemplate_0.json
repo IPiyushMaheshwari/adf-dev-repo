@@ -1,0 +1,1260 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-dev-pipelines"
+		},
+		"LS_DEV_Blob_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_DEV_Blob'"
+		},
+		"LS_PROD_Blob_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_PROD_Blob'"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_DEV_Blob')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_DEV_Blob_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_PROD_Blob')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_PROD_Blob_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_DEV_Inpu')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_DEV_Blob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "BigMart_Sales.csv",
+						"container": "dev-input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Item_Identifier",
+						"type": "String"
+					},
+					{
+						"name": "Item_Weight",
+						"type": "String"
+					},
+					{
+						"name": "Item_Fat_Content",
+						"type": "String"
+					},
+					{
+						"name": "Item_Visibility",
+						"type": "String"
+					},
+					{
+						"name": "Item_Type",
+						"type": "String"
+					},
+					{
+						"name": "Item_MRP",
+						"type": "String"
+					},
+					{
+						"name": "Outlet_Identifier",
+						"type": "String"
+					},
+					{
+						"name": "Outlet_Establishment_Year",
+						"type": "String"
+					},
+					{
+						"name": "Outlet_Size",
+						"type": "String"
+					},
+					{
+						"name": "Outlet_Location_Type",
+						"type": "String"
+					},
+					{
+						"name": "Outlet_Type",
+						"type": "String"
+					},
+					{
+						"name": "Item_Outlet_Sales",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DEV_Blob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_DEV_out')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_DEV_Blob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "dev-output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DEV_Blob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_PROD_Output')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_PROD_Blob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "prod-output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_PROD_Blob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_DEV_Blob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "modified_items_data.csv",
+						"container": "dev-output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "old_Item_Identifier",
+						"type": "String"
+					},
+					{
+						"name": "old_Item_Weight",
+						"type": "String"
+					},
+					{
+						"name": "old_Item_Fat_Content",
+						"type": "String"
+					},
+					{
+						"name": "old_Item_Visibility",
+						"type": "String"
+					},
+					{
+						"name": "old_Item_Type",
+						"type": "String"
+					},
+					{
+						"name": "old_Item_MRP",
+						"type": "String"
+					},
+					{
+						"name": "old_Outlet_Identifier",
+						"type": "String"
+					},
+					{
+						"name": "old_Outlet_Establishment_Year",
+						"type": "String"
+					},
+					{
+						"name": "old_Outlet_Size",
+						"type": "String"
+					},
+					{
+						"name": "old_Outlet_Location_Type",
+						"type": "String"
+					},
+					{
+						"name": "old_Outlet_Type",
+						"type": "String"
+					},
+					{
+						"name": "old_Item_Outlet_Sales",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DEV_Blob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_DEV_Blob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "modified_items_data1.csv",
+						"container": "dev-output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Item_Identifier",
+						"type": "String"
+					},
+					{
+						"name": "Item_Weight",
+						"type": "String"
+					},
+					{
+						"name": "Item_Fat_Content",
+						"type": "String"
+					},
+					{
+						"name": "Item_Visibility",
+						"type": "String"
+					},
+					{
+						"name": "Item_Type",
+						"type": "String"
+					},
+					{
+						"name": "Item_MRP",
+						"type": "String"
+					},
+					{
+						"name": "Outlet_Identifier",
+						"type": "String"
+					},
+					{
+						"name": "Outlet_Establishment_Year",
+						"type": "String"
+					},
+					{
+						"name": "Outlet_Size",
+						"type": "String"
+					},
+					{
+						"name": "Outlet_Location_Type",
+						"type": "String"
+					},
+					{
+						"name": "Outlet_Type",
+						"type": "String"
+					},
+					{
+						"name": "Item_Outlet_Sales",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DEV_Blob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/source')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_DEV_Blob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "one.csv",
+						"container": "dev-output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "Name",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					},
+					{
+						"name": "Salary",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DEV_Blob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/target')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_DEV_Blob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "two.csv",
+						"container": "dev-output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "Name",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					},
+					{
+						"name": "Salary",
+						"type": "String"
+					},
+					{
+						"name": "StartDate",
+						"type": "String"
+					},
+					{
+						"name": "EndDate",
+						"type": "String"
+					},
+					{
+						"name": "IsActive",
+						"type": "String"
+					},
+					{
+						"name": "ChangeTimestamp",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DEV_Blob')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_Add_Derived_Column')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_DEV_Inpu",
+								"type": "DatasetReference"
+							},
+							"name": "SRCDEV"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DEV_out",
+								"type": "DatasetReference"
+							},
+							"name": "SNKPROD"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Item_Identifier as string,",
+						"          Item_Weight as string,",
+						"          Item_Fat_Content as string,",
+						"          Item_Visibility as string,",
+						"          Item_Type as string,",
+						"          Item_MRP as integer,",
+						"          Outlet_Identifier as string,",
+						"          Outlet_Establishment_Year as string,",
+						"          Outlet_Size as string,",
+						"          Outlet_Location_Type as string,",
+						"          Outlet_Type as string,",
+						"          Item_Outlet_Sales as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     inferDriftedColumnTypes: true,",
+						"     ignoreNoFilesFound: false) ~> SRCDEV",
+						"SRCDEV derive(Sales_Category = iif(Item_Outlet_Sales > 10000, 'HIGH', 'LOW'),",
+						"          Discounted_MRP = Item_MRP * 0.9) ~> derivedColumn1",
+						"derivedColumn1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SNKPROD"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_Inpu')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_out')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_Aggregate_Data')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_DEV_Inpu",
+								"type": "DatasetReference"
+							},
+							"name": "SRCDEV"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DEV_out",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "AggSalesByCategory"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Item_Identifier as string,",
+						"          Item_Weight as integer,",
+						"          Item_Fat_Content as string,",
+						"          Item_Visibility as integer,",
+						"          Item_Type as string,",
+						"          Item_MRP as integer,",
+						"          Outlet_Identifier as string,",
+						"          Outlet_Establishment_Year as integer,",
+						"          Outlet_Size as integer,",
+						"          Outlet_Location_Type as string,",
+						"          Outlet_Type as string,",
+						"          Item_Outlet_Sales as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     inferDriftedColumnTypes: true,",
+						"     ignoreNoFilesFound: false) ~> SRCDEV",
+						"SRCDEV aggregate(groupBy(Outlet_Identifier,",
+						"          Item_Type,",
+						"          Outlet_Type,",
+						"          Outlet_Location_Type),",
+						"     Total_Sales = sum(Item_Outlet_Sales),",
+						"          Avg_Item_MRP = avg(Item_MRP),",
+						"          Total_Items = count(Item_Identifier),",
+						"          Avg_Item_Visibility = avg(Item_Visibility)) ~> AggSalesByCategory",
+						"AggSalesByCategory sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_Inpu')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_out')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_Filter_Sales')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_DEV_Inpu",
+								"type": "DatasetReference"
+							},
+							"name": "SRCDEV"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DEV_out",
+								"type": "DatasetReference"
+							},
+							"name": "SinkProd"
+						}
+					],
+					"transformations": [
+						{
+							"name": "FilterHighSales"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Item_Identifier as string,",
+						"          Item_Weight as string,",
+						"          Item_Fat_Content as string,",
+						"          Item_Visibility as string,",
+						"          Item_Type as string,",
+						"          Item_MRP as string,",
+						"          Outlet_Identifier as string,",
+						"          Outlet_Establishment_Year as string,",
+						"          Outlet_Size as string,",
+						"          Outlet_Location_Type as string,",
+						"          Outlet_Type as string,",
+						"          Item_Outlet_Sales as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     inferDriftedColumnTypes: true,",
+						"     ignoreNoFilesFound: false) ~> SRCDEV",
+						"SRCDEV filter(Item_Outlet_Sales > 5000) ~> FilterHighSales",
+						"FilterHighSales sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SinkProd"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_Inpu')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_out')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_Select_Columns')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_DEV_Inpu",
+								"type": "DatasetReference"
+							},
+							"name": "SRCDEV"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DEV_out",
+								"type": "DatasetReference"
+							},
+							"name": "SinkProd"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectRequiredColumns"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Item_Identifier as string,",
+						"          Item_Weight as string,",
+						"          Item_Fat_Content as string,",
+						"          Item_Visibility as string,",
+						"          Item_Type as string,",
+						"          Item_MRP as string,",
+						"          Outlet_Identifier as string,",
+						"          Outlet_Establishment_Year as string,",
+						"          Outlet_Size as string,",
+						"          Outlet_Location_Type as string,",
+						"          Outlet_Type as string,",
+						"          Item_Outlet_Sales as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     inferDriftedColumnTypes: true,",
+						"     ignoreNoFilesFound: false) ~> SRCDEV",
+						"SRCDEV select(mapColumn(",
+						"          Item_Identifier,",
+						"          Item_Type,",
+						"          Item_Outlet_Sales",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectRequiredColumns",
+						"SelectRequiredColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SinkProd"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_Inpu')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_out')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_Sort_Data')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_DEV_Inpu",
+								"type": "DatasetReference"
+							},
+							"name": "SRCDEV"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DEV_out",
+								"type": "DatasetReference"
+							},
+							"name": "SNKPROD"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SortBySales"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Item_Identifier as string,",
+						"          Item_Weight as string,",
+						"          Item_Fat_Content as string,",
+						"          Item_Visibility as string,",
+						"          Item_Type as string,",
+						"          Item_MRP as string,",
+						"          Outlet_Identifier as string,",
+						"          Outlet_Establishment_Year as string,",
+						"          Outlet_Size as string,",
+						"          Outlet_Location_Type as string,",
+						"          Outlet_Type as string,",
+						"          Item_Outlet_Sales as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     inferDriftedColumnTypes: true,",
+						"     ignoreNoFilesFound: false) ~> SRCDEV",
+						"SRCDEV sort(desc(Item_Outlet_Sales, true)) ~> SortBySales",
+						"SortBySales sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SNKPROD"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_Inpu')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_out')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_DEV_Inpu",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DEV_out",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "sort1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Item_Identifier as string,",
+						"          Item_Weight as string,",
+						"          Item_Fat_Content as string,",
+						"          Item_Visibility as string,",
+						"          Item_Type as string,",
+						"          Item_MRP as string,",
+						"          Outlet_Identifier as string,",
+						"          Outlet_Establishment_Year as string,",
+						"          Outlet_Size as string,",
+						"          Outlet_Location_Type as string,",
+						"          Outlet_Type as string,",
+						"          Item_Outlet_Sales as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"source1 sort(asc(Item_Weight, true)) ~> sort1",
+						"sort1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_Inpu')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_out')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow7scd1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_DEV_Inpu",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DelimitedText2",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "alterRow1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Item_Identifier as string,",
+						"          Item_Weight as string,",
+						"          Item_Fat_Content as string,",
+						"          Item_Visibility as string,",
+						"          Item_Type as string,",
+						"          Item_MRP as string,",
+						"          Outlet_Identifier as string,",
+						"          Outlet_Establishment_Year as string,",
+						"          Outlet_Size as string,",
+						"          Outlet_Location_Type as string,",
+						"          Outlet_Type as string,",
+						"          Item_Outlet_Sales as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"source1 alterRow(upsertIf(1==1)) ~> alterRow1",
+						"alterRow1 sink(allowSchemaDrift: false,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Item_Identifier as string,",
+						"          Item_Weight as string,",
+						"          Item_Fat_Content as string,",
+						"          Item_Visibility as string,",
+						"          Item_Type as string,",
+						"          Item_MRP as string,",
+						"          Outlet_Identifier as string,",
+						"          Outlet_Establishment_Year as string,",
+						"          Outlet_Size as string,",
+						"          Outlet_Location_Type as string,",
+						"          Outlet_Type as string,",
+						"          Item_Outlet_Sales as string",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_Inpu')]",
+				"[concat(variables('factoryId'), '/datasets/DelimitedText2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_scd_type2_customer')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "source",
+								"type": "DatasetReference"
+							},
+							"name": "srccustomer"
+						},
+						{
+							"dataset": {
+								"referenceName": "target",
+								"type": "DatasetReference"
+							},
+							"name": "tgtcustomer"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "target",
+								"type": "DatasetReference"
+							},
+							"name": "sink2"
+						},
+						{
+							"dataset": {
+								"referenceName": "target",
+								"type": "DatasetReference"
+							},
+							"name": "sink3"
+						}
+					],
+					"transformations": [
+						{
+							"name": "filter1"
+						},
+						{
+							"name": "join1"
+						},
+						{
+							"name": "drvflag",
+							"description": "Creating/updating the columns 'CustomerID, Name, City, Salary, CustomerID, Name, City, Salary, StartDate, EndDate, IsActive, ChangeTimestamp, isNull(tgt.CustomerID),'"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "split1"
+						},
+						{
+							"name": "derivedColumn3"
+						},
+						{
+							"name": "derivedColumn4"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          CustomerID as string,",
+						"          Name as string,",
+						"          City as string,",
+						"          Salary as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> srccustomer",
+						"source(output(",
+						"          CustomerID as string,",
+						"          Name as string,",
+						"          City as string,",
+						"          Salary as string,",
+						"          StartDate as string,",
+						"          EndDate as string,",
+						"          IsActive as boolean,",
+						"          ChangeTimestamp as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     inferDriftedColumnTypes: true,",
+						"     ignoreNoFilesFound: false) ~> tgtcustomer",
+						"tgtcustomer filter(IsActive==true()) ~> filter1",
+						"derivedColumn1, derivedColumn2 join(srccustomer@CustomerID == tgtcustomer@CustomerID,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"join1 derive({New record} = isNull(tgt_CustomerID),",
+						"          {Changed record} = !isNull(tgt_CustomerID) && (   src_Name   != tgt_Name ||   src_City   != tgt_City ||   src_Salary != tgt_Salary )) ~> drvflag",
+						"srccustomer derive(src_CustomerID = CustomerID,",
+						"          src_Name = Name,",
+						"          src_City = City,",
+						"          src_Salary = Salary) ~> derivedColumn1",
+						"filter1 derive(tgt_CustomerID = CustomerID,",
+						"          tgt_Name = Name,",
+						"          tgt_City = City,",
+						"          tgt_Salary = Salary) ~> derivedColumn2",
+						"drvflag split(isNull(tgt_CustomerID),",
+						"     !isNull(tgt_CustomerID) && (   src_Name   != tgt_Name ||   src_City   != tgt_City ||   src_Salary != tgt_Salary ),",
+						"     disjoint: false) ~> split1@(NewRecords, ChangedRecords, Unchanged)",
+						"split1@ChangedRecords derive(EndDate = toString(currentTimestamp()),",
+						"          IsActive = false(),",
+						"          ChangeTimestamp = toString(currentTimestamp())) ~> derivedColumn3",
+						"split1@NewRecords derive(CustomerID = src_CustomerID,",
+						"          Name = src_Name,",
+						"          City = src_City,",
+						"          Salary = src_Salary,",
+						"          StartDate = currentTimestamp(),",
+						"          EndDate = \"\",",
+						"          IsActive = true(),",
+						"          ChangeTimestamp = currentTimestamp()) ~> derivedColumn4",
+						"derivedColumn3 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          CustomerID as string,",
+						"          Name as string,",
+						"          City as string,",
+						"          Salary as string,",
+						"          StartDate as string,",
+						"          EndDate as string,",
+						"          IsActive as string,",
+						"          ChangeTimestamp as string",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink2",
+						"derivedColumn4 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          CustomerID as string,",
+						"          Name as string,",
+						"          City as string,",
+						"          Salary as string,",
+						"          StartDate as string,",
+						"          EndDate as string,",
+						"          IsActive as string,",
+						"          ChangeTimestamp as string",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink3"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/source')]",
+				"[concat(variables('factoryId'), '/datasets/target')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_Derived_Column_6')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow6",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_Add_Derived_Column",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"SRCDEV": {},
+									"SNKPROD": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-12-27T10:11:38Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_Add_Derived_Column')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_Filter_Data')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy_Filtered_Data",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_DEV_Inpu",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_DEV_out",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_Filter_Sales",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"SRCDEV": {},
+									"SinkProd": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-12-26T11:00:06Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_Inpu')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DEV_out')]",
+				"[concat(variables('factoryId'), '/dataflows/DF_Filter_Sales')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_Select_Columns_02')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow2",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_Select_Columns",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"SRCDEV": {},
+									"SinkProd": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-12-26T11:23:09Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_Select_Columns')]"
+			]
+		}
+	]
+}
