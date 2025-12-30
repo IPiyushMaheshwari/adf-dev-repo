@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Dat",
+				"name": "Data",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
