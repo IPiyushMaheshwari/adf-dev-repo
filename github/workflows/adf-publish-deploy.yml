@@ -26,9 +26,5 @@ jobs:
         resourceGroupName: rg-adf-dev-prod
         region: southindia
         template: adf-dev-pipelines/ARMTemplateForFactory.json
-        parameters: |
-          adf-dev-pipelines/ARMTemplateParametersForFactory.json
-          factoryName=adf-prod-pipelines
-          LS_DEV_Blob_connectionString=${{ secrets.LS_DEV_BLOB_CONN }}
-          LS_PROD_Blob_connectionString=${{ secrets.LS_PROD_BLOB_CONN }}
+        parameters: adf-dev-pipelines/ARMTemplateParametersForFactory.json
         deploymentMode: Incremental
