@@ -19,7 +19,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Dataff",
+						"name": "Dataf",
 						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
