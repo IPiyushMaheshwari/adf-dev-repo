@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Dataf",
+				"name": "Datafk",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
