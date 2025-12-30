@@ -1,0 +1,150 @@
+{
+	"name": "df_scd_type2_customer",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "source",
+						"type": "DatasetReference"
+					},
+					"name": "srccustomer"
+				},
+				{
+					"dataset": {
+						"referenceName": "target",
+						"type": "DatasetReference"
+					},
+					"name": "tgtcustomer"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "target",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
+				},
+				{
+					"dataset": {
+						"referenceName": "target",
+						"type": "DatasetReference"
+					},
+					"name": "sink3"
+				}
+			],
+			"transformations": [
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "drvflag",
+					"description": "Creating/updating the columns 'CustomerID, Name, City, Salary, CustomerID, Name, City, Salary, StartDate, EndDate, IsActive, ChangeTimestamp, isNull(tgt.CustomerID),'"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "split1"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          CustomerID as string,",
+				"          Name as string,",
+				"          City as string,",
+				"          Salary as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> srccustomer",
+				"source(output(",
+				"          CustomerID as string,",
+				"          Name as string,",
+				"          City as string,",
+				"          Salary as string,",
+				"          StartDate as string,",
+				"          EndDate as string,",
+				"          IsActive as boolean,",
+				"          ChangeTimestamp as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     inferDriftedColumnTypes: true,",
+				"     ignoreNoFilesFound: false) ~> tgtcustomer",
+				"tgtcustomer filter(IsActive==true()) ~> filter1",
+				"derivedColumn1, derivedColumn2 join(srccustomer@CustomerID == tgtcustomer@CustomerID,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 derive({New record} = isNull(tgt_CustomerID),",
+				"          {Changed record} = !isNull(tgt_CustomerID) && (   src_Name   != tgt_Name ||   src_City   != tgt_City ||   src_Salary != tgt_Salary )) ~> drvflag",
+				"srccustomer derive(src_CustomerID = CustomerID,",
+				"          src_Name = Name,",
+				"          src_City = City,",
+				"          src_Salary = Salary) ~> derivedColumn1",
+				"filter1 derive(tgt_CustomerID = CustomerID,",
+				"          tgt_Name = Name,",
+				"          tgt_City = City,",
+				"          tgt_Salary = Salary) ~> derivedColumn2",
+				"drvflag split(isNull(tgt_CustomerID),",
+				"     !isNull(tgt_CustomerID) && (   src_Name   != tgt_Name ||   src_City   != tgt_City ||   src_Salary != tgt_Salary ),",
+				"     disjoint: false) ~> split1@(NewRecords, ChangedRecords, Unchanged)",
+				"split1@ChangedRecords derive(EndDate = toString(currentTimestamp()),",
+				"          IsActive = false(),",
+				"          ChangeTimestamp = toString(currentTimestamp())) ~> derivedColumn3",
+				"split1@NewRecords derive(CustomerID = src_CustomerID,",
+				"          Name = src_Name,",
+				"          City = src_City,",
+				"          Salary = src_Salary,",
+				"          StartDate = currentTimestamp(),",
+				"          EndDate = \"\",",
+				"          IsActive = true(),",
+				"          ChangeTimestamp = currentTimestamp()) ~> derivedColumn4",
+				"derivedColumn3 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          CustomerID as string,",
+				"          Name as string,",
+				"          City as string,",
+				"          Salary as string,",
+				"          StartDate as string,",
+				"          EndDate as string,",
+				"          IsActive as string,",
+				"          ChangeTimestamp as string",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink2",
+				"derivedColumn4 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          CustomerID as string,",
+				"          Name as string,",
+				"          City as string,",
+				"          Salary as string,",
+				"          StartDate as string,",
+				"          EndDate as string,",
+				"          IsActive as string,",
+				"          ChangeTimestamp as string",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink3"
+			]
+		}
+	}
+}

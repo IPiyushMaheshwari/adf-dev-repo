@@ -1,0 +1,63 @@
+{
+	"name": "DF_Aggregate_Data",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_DEV_Inpu",
+						"type": "DatasetReference"
+					},
+					"name": "SRCDEV"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_DEV_out",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AggSalesByCategory"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Item_Identifier as string,",
+				"          Item_Weight as integer,",
+				"          Item_Fat_Content as string,",
+				"          Item_Visibility as integer,",
+				"          Item_Type as string,",
+				"          Item_MRP as integer,",
+				"          Outlet_Identifier as string,",
+				"          Outlet_Establishment_Year as integer,",
+				"          Outlet_Size as integer,",
+				"          Outlet_Location_Type as string,",
+				"          Outlet_Type as string,",
+				"          Item_Outlet_Sales as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     inferDriftedColumnTypes: true,",
+				"     ignoreNoFilesFound: false) ~> SRCDEV",
+				"SRCDEV aggregate(groupBy(Outlet_Identifier,",
+				"          Item_Type,",
+				"          Outlet_Type,",
+				"          Outlet_Location_Type),",
+				"     Total_Sales = sum(Item_Outlet_Sales),",
+				"          Avg_Item_MRP = avg(Item_MRP),",
+				"          Total_Items = count(Item_Identifier),",
+				"          Avg_Item_Visibility = avg(Item_Visibility)) ~> AggSalesByCategory",
+				"AggSalesByCategory sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,73 @@
+{
+	"name": "DelimitedText1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_DEV_Blob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "modified_items_data.csv",
+				"container": "dev-output"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "old_Item_Identifier",
+				"type": "String"
+			},
+			{
+				"name": "old_Item_Weight",
+				"type": "String"
+			},
+			{
+				"name": "old_Item_Fat_Content",
+				"type": "String"
+			},
+			{
+				"name": "old_Item_Visibility",
+				"type": "String"
+			},
+			{
+				"name": "old_Item_Type",
+				"type": "String"
+			},
+			{
+				"name": "old_Item_MRP",
+				"type": "String"
+			},
+			{
+				"name": "old_Outlet_Identifier",
+				"type": "String"
+			},
+			{
+				"name": "old_Outlet_Establishment_Year",
+				"type": "String"
+			},
+			{
+				"name": "old_Outlet_Size",
+				"type": "String"
+			},
+			{
+				"name": "old_Outlet_Location_Type",
+				"type": "String"
+			},
+			{
+				"name": "old_Outlet_Type",
+				"type": "String"
+			},
+			{
+				"name": "old_Item_Outlet_Sales",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

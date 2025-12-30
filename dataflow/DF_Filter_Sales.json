@@ -1,0 +1,56 @@
+{
+	"name": "DF_Filter_Sales",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_DEV_Inpu",
+						"type": "DatasetReference"
+					},
+					"name": "SRCDEV"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_DEV_out",
+						"type": "DatasetReference"
+					},
+					"name": "SinkProd"
+				}
+			],
+			"transformations": [
+				{
+					"name": "FilterHighSales"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Item_Identifier as string,",
+				"          Item_Weight as string,",
+				"          Item_Fat_Content as string,",
+				"          Item_Visibility as string,",
+				"          Item_Type as string,",
+				"          Item_MRP as string,",
+				"          Outlet_Identifier as string,",
+				"          Outlet_Establishment_Year as string,",
+				"          Outlet_Size as string,",
+				"          Outlet_Location_Type as string,",
+				"          Outlet_Type as string,",
+				"          Item_Outlet_Sales as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     inferDriftedColumnTypes: true,",
+				"     ignoreNoFilesFound: false) ~> SRCDEV",
+				"SRCDEV filter(Item_Outlet_Sales > 5000) ~> FilterHighSales",
+				"FilterHighSales sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SinkProd"
+			]
+		}
+	}
+}

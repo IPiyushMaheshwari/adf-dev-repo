@@ -1,0 +1,9 @@
+{
+	"name": "adf-dev-pipelines",
+	"location": "southindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "512bc0bc-0b38-46ad-824a-1619a7b569a9",
+		"tenantId": "e3ca8a3f-00b7-443a-b91c-00451105271b"
+	}
+}
