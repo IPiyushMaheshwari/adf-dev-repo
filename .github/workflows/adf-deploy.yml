@@ -11,15 +11,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
+    - name: Checkout main
       uses: actions/checkout@v4
 
-    - name: Azure Login (Service Principal via JSON)
+    - name: Checkout adf-dev-pipelines branch
+      uses: actions/checkout@v4
+      with:
+        ref: adf-dev-pipelines
+        path: adf-dev-pipelines
+
+    - name: Azure Login
       uses: azure/login@v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Deploy ARM template to PROD ADF
+    - name: Deploy ARM template
       uses: azure/arm-deploy@v2
       with:
         scope: resourcegroup
