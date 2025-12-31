@@ -29,4 +29,4 @@ jobs:
         region: southindia
         template: adf-dev-pipelines/ARMTemplateForFactory.json
         parameters: adf-dev-pipelines/ARMTemplateParametersForFactory.json
-        deploymentMode: Incremental
+        deploymentMode: Complete
