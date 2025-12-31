@@ -230,7 +230,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Dataa",
+						"name": "Data",
 						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
