@@ -11,16 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout main branch
+    - name: Checkout repo
       uses: actions/checkout@v4
 
-    - name: Checkout adf_publish branch
-      uses: actions/checkout@v4
-      with:
-        ref: adf_publish
-        path: adf_publish
-
-    - name: Azure Login
+    - name: Azure Login (Service Principal via JSON)
       uses: azure/login@v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
@@ -31,6 +25,6 @@ jobs:
         scope: resourcegroup
         resourceGroupName: rg-adf-dev-prod
         region: southindia
-        template: adf_publish/ARMTemplateForFactory.json
-        parameters: adf_publish/ARMTemplateParametersForFactory.json
+        template: adf-dev-pipelines/ARMTemplateForFactory.json
+        parameters: adf-dev-pipelines/ARMTemplateParametersForFactory.json
         deploymentMode: Incremental
