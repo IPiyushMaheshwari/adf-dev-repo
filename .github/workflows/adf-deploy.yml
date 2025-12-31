@@ -14,7 +14,7 @@ jobs:
     - name: Checkout ADF publish branch
       uses: actions/checkout@v4
       with:
-        ref: adf-dev-pipelines
+        ref: adf_publish
 
     - name: Azure Login
       uses: azure/login@v2
